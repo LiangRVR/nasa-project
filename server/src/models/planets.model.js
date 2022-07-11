@@ -1,6 +1,6 @@
-const { parse } = require("csv-parse");
-const { createReadStream } = require("node:fs");
 const path = require("node:path");
+const { createReadStream } = require("node:fs");
+const { parse } = require("csv-parse");
 
 let habitablePlanets = [];
 
