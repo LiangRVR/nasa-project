@@ -1,3 +1,4 @@
+const launchesModel = {}
 const launches = new Map();
 
 const launch = {
@@ -13,4 +14,8 @@ const launch = {
 
 launches.set(launch.flightNumber, launch);
 
-module.exports = { launches };
+launchesModel.getAllLaunches = ()=>{
+  return Array.from(launches.values())
+}
+
+module.exports = launchesModel;

@@ -2,9 +2,10 @@ const path = require("node:path");
 const { createReadStream } = require("node:fs");
 const { parse } = require("csv-parse");
 
+const planetsModel = {};
 let habitablePlanets = [];
 
-let isHabitablePlanet = (planet) => {
+const isHabitablePlanet = (planet) => {
   return (
     planet["koi_disposition"] === "CONFIRMED" &&
     planet["koi_insol"] > 0.36 &&
@@ -12,7 +13,8 @@ let isHabitablePlanet = (planet) => {
     planet["koi_prad"] < 1.6
   );
 };
-const loadPlanets = async () => {
+
+planetsModel.loadPlanets = async () => {
   return new Promise((resolve, reject) => {
     createReadStream(
       path.join(__dirname, "..", "..", "data", "kepler_data.csv")
@@ -40,7 +42,8 @@ const loadPlanets = async () => {
   });
 };
 
-module.exports = {
-  loadPlanets,
-  planets: habitablePlanets,
+planetsModel.getAllPlanets = () => {
+  return habitablePlanets;
 };
+
+module.exports = planetsModel;

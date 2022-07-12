@@ -3,6 +3,6 @@ const launchesController = require("./launches.controller")
 
 const launchesRouter = express.Router();
 
-launchesRouter.get('/launches', launchesController.getAllLaunches)
+launchesRouter.get('/launches', launchesController.httpGetAllLaunches)
 
 module.exports= launchesRouter
