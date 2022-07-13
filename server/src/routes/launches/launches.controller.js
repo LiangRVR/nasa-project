@@ -5,7 +5,7 @@ launchesController.httpGetAllLaunches = (req, res) => {
   res.status(200).json(launchesModel.getAllLaunches());
 };
 
-launchesController.httpAddNewLAunch = (req, res) => {
+launchesController.httpAddNewLaunch = (req, res) => {
   const launch = { ...req.body, launchDate: new Date(req.body.launchDate) };
 
   if (
