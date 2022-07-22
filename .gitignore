@@ -8,6 +8,7 @@
 
 # testing
 /client/coverage
+/server/coverage
 
 # production
 /client/build
@@ -23,3 +24,5 @@
 /client/npm-debug.log*
 /client/yarn-debug.log*
 /client/yarn-error.log*
+
+/server/.env
