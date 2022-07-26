@@ -1,8 +1,7 @@
 const launchesDataBase = require("./launches.schema");
 const planets = require("./planets.schema");
 const launchesModel = {};
-const launches = new Map();
-let latestFlightNumber = 100;
+const DEFAULT_FLIGHT_NUMBER = 100;
 
 const launch = {
   flightNumber: 100,
@@ -15,23 +14,18 @@ const launch = {
   success: true,
 };
 
-launches.set(launch.flightNumber, launch);
+const getLatestFlightNumber = async() => {
+  const latestLaunch = await launchesDataBase.findOne().sort("-flightNumber");
+  console.log("pass", latestLaunch)
+  if (!latestLaunch) {
+    return DEFAULT_FLIGHT_NUMBER;
+  }
+
+  return latestLaunch.flightNumber;
+};
 
 launchesModel.getAllLaunches = async () => {
   return await launchesDataBase.find({}, { _id: 0, __v: 0 });
-};
-
-launchesModel.addNewLaunch = (launch) => {
-  latestFlightNumber++;
-  launches.set(
-    latestFlightNumber,
-    Object.assign(launch, {
-      upcoming: true,
-      success: true,
-      customer: ["ZTM", "NASA"],
-      flightNumber: latestFlightNumber,
-    })
-  );
 };
 
 launchesModel.saveLaunch = async (launch) => {
@@ -44,7 +38,7 @@ launchesModel.saveLaunch = async (launch) => {
   }
 
   try {
-    await launchesDataBase.updateOne(
+    await launchesDataBase.findOneAndUpdate(
       {
         flightNumber: launch.flightNumber,
       },
@@ -54,11 +48,22 @@ launchesModel.saveLaunch = async (launch) => {
       }
     );
   } catch (error) {
-    console.error(`launches do not added ${error}`);
+    throw new Error(`launches do not added ${error}`);
   }
 };
 
 launchesModel.saveLaunch(launch);
+
+launchesModel.scheduleNewLaunch = async (launch) => {
+  const newFlightNumber = (await getLatestFlightNumber()) + 1;
+  const newLaunch = Object.assign(launch, {
+    upcoming: true,
+    success: true,
+    customer: ["ZTM", "NASA"],
+    flightNumber: newFlightNumber,
+  });
+    await launchesModel.saveLaunch(newLaunch);
+};
 
 launchesModel.existLaunchWithId = (id) => {
   return launches.has(id);

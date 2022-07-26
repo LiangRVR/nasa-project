@@ -5,7 +5,7 @@ launchesController.httpGetAllLaunches = async (req, res) => {
   res.status(200).json(await launchesModel.getAllLaunches());
 };
 
-launchesController.httpAddNewLaunch = (req, res) => {
+launchesController.httpAddNewLaunch = async (req, res) => {
   const launch = { ...req.body, launchDate: new Date(req.body.launchDate) };
 
   if (
@@ -24,8 +24,13 @@ launchesController.httpAddNewLaunch = (req, res) => {
       error: "Invalid launch date",
     });
   }
-
-  launchesModel.addNewLaunch(launch);
+  try {
+    await launchesModel.scheduleNewLaunch(launch);
+  } catch (error) {
+    return res.status(400).json({
+      error
+    });
+  }
 
   return res.status(201).json(launch);
 };
