@@ -1,4 +1,5 @@
 const launchesDataBase = require("./launches.schema");
+const planets = require("./planets.schema");
 const launchesModel = {};
 const launches = new Map();
 let latestFlightNumber = 100;
@@ -34,6 +35,14 @@ launchesModel.addNewLaunch = (launch) => {
 };
 
 launchesModel.saveLaunch = async (launch) => {
+  const planet = await planets.findOne({
+    keplerName: launch.target,
+  });
+
+  if (!planet) {
+    throw new Error("No matching planet found");
+  }
+
   try {
     await launchesDataBase.updateOne(
       {
