@@ -1,3 +1,4 @@
+const launchesDataBase = require("./launches.schema");
 const launchesModel = {};
 const launches = new Map();
 let lastFlightNumber = 100;
@@ -30,6 +31,22 @@ launchesModel.addNewLaunch = (launch) => {
       flightNumber: lastFlightNumber,
     })
   );
+};
+
+launchesModel.saveLaunch = async (launch) => {
+  try {
+    await launchesDataBase.updateOne(
+      {
+        lastFlightNumber: launch.lastFlightNumber,
+      },
+      launch,
+      {
+        upsert: true,
+      }
+    );
+  } catch (error) {
+    console.error(`launches do not added ${error}`);
+  }
 };
 
 launchesModel.existLaunchWithId = (id) => {
