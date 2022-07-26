@@ -1,8 +1,8 @@
 const launchesModel = require("../../models/launches.model");
 const launchesController = {};
 
-launchesController.httpGetAllLaunches = (req, res) => {
-  res.status(200).json(launchesModel.getAllLaunches());
+launchesController.httpGetAllLaunches = async (req, res) => {
+  res.status(200).json(await launchesModel.getAllLaunches());
 };
 
 launchesController.httpAddNewLaunch = (req, res) => {

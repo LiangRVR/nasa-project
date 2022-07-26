@@ -1,7 +1,7 @@
 const launchesDataBase = require("./launches.schema");
 const launchesModel = {};
 const launches = new Map();
-let lastFlightNumber = 100;
+let latestFlightNumber = 100;
 
 const launch = {
   flightNumber: 100,
@@ -16,19 +16,19 @@ const launch = {
 
 launches.set(launch.flightNumber, launch);
 
-launchesModel.getAllLaunches = () => {
-  return Array.from(launches.values());
+launchesModel.getAllLaunches = async () => {
+  return await launchesDataBase.find({}, { _id: 0, __v: 0 });
 };
 
 launchesModel.addNewLaunch = (launch) => {
-  lastFlightNumber++;
+  latestFlightNumber++;
   launches.set(
-    lastFlightNumber,
+    latestFlightNumber,
     Object.assign(launch, {
       upcoming: true,
       success: true,
       customer: ["ZTM", "NASA"],
-      flightNumber: lastFlightNumber,
+      flightNumber: latestFlightNumber,
     })
   );
 };
@@ -37,7 +37,7 @@ launchesModel.saveLaunch = async (launch) => {
   try {
     await launchesDataBase.updateOne(
       {
-        lastFlightNumber: launch.lastFlightNumber,
+        flightNumber: launch.flightNumber,
       },
       launch,
       {
@@ -48,6 +48,8 @@ launchesModel.saveLaunch = async (launch) => {
     console.error(`launches do not added ${error}`);
   }
 };
+
+launchesModel.saveLaunch(launch);
 
 launchesModel.existLaunchWithId = (id) => {
   return launches.has(id);
