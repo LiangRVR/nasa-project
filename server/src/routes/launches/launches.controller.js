@@ -28,24 +28,27 @@ launchesController.httpAddNewLaunch = async (req, res) => {
     await launchesModel.scheduleNewLaunch(launch);
   } catch (error) {
     return res.status(400).json({
-      error
+      error,
     });
   }
 
   return res.status(201).json(launch);
 };
 
-launchesController.httpAbortLaunch = (req, res) => {
+launchesController.httpAbortLaunch = async (req, res) => {
   const launchId = Number(req.params.id);
-
-  if (!launchesModel.existLaunchWithId(launchId)) {
+  const existLaunch = await launchesModel.existLaunchWithId(launchId);
+  if (!existLaunch) {
     return res.status(400).json({
       error: "Launch not found",
     });
   }
 
-  const aborted = launchesModel.abortLaunchById(launchId);
-  return res.status(200).json(aborted);
+  const aborted = await launchesModel.abortLaunchById(launchId);
+  if (!aborted) {
+    return res.status(400).json({ error: "Launch not aborted" });
+  }
+  return res.status(200).json({ ok: true });
 };
 
 module.exports = launchesController;
