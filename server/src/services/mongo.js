@@ -1,4 +1,6 @@
+require("dotenv").config();
 const mongoose = require("mongoose");
+const mongoService = {};
 
 const dbUsername = process.env.DB_USERNAME;
 const dbPassword = process.env.DB_PASSWORD;
@@ -13,10 +15,13 @@ mongoose.connection.on("error", (err) => {
   console.error(err);
 });
 
-const mongoConnect = async () => {
+mongoService.mongoConnect = async () => {
   await mongoose.connect(MONGO_URL);
 };
 
-module.exports = {
-  mongoConnect,
+mongoService.mongoDisconnect = async () => {
+  await mongoose.disconnect();
+  console.log("mongodb is disconnected")
 };
+
+module.exports = mongoService;
