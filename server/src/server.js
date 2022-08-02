@@ -1,6 +1,7 @@
 require("dotenv").config();
 const http = require("node:http");
 const { loadPlanets } = require("./models/planets.model");
+const {loadLaunchesData} = require("./models/launches.model")
 const { mongoConnect } = require("./services/mongo");
 const app = require("./app");
 
@@ -12,6 +13,7 @@ const startServer = async () => {
   await mongoConnect();
   try {
     await loadPlanets();
+    await loadLaunchesData();
     server.listen(PORT, () => {
       console.log(`Listening on Port ${PORT} 🖥 `);
     });

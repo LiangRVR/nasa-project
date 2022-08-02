@@ -1,7 +1,9 @@
+const axios = require("axios").default;
 const launches = require("./launches.schema");
 const planets = require("./planets.schema");
 const launchesModel = {};
 const DEFAULT_FLIGHT_NUMBER = 100;
+const SPACEX_API_URL = "https://api.spacexdata.com/v5/launches/query";
 
 const launch = {
   flightNumber: 100,
@@ -77,6 +79,29 @@ launchesModel.abortLaunchById = async (id) => {
     }
   );
   return aborted.modifiedCount === 1;
+};
+
+launchesModel.loadLaunchesData = async () => {
+  console.log("Downloading Launches Data");
+  const response = await axios.post(SPACEX_API_URL, {
+    query: {},
+    options: {
+      populate: [
+        {
+          path: "rocket",
+          select: {
+            name: 1,
+          },
+        },
+        {
+          path: "payload",
+          select: {
+            customers: 1,
+          },
+        },
+      ],
+    },
+  });
 };
 
 module.exports = launchesModel;
