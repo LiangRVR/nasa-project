@@ -26,4 +26,3 @@
 /client/yarn-error.log*
 
 /server/.env
-/server/public
