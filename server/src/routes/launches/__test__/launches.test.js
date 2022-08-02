@@ -12,16 +12,16 @@ describe("Launches tests", () => {
   afterAll(async () => {
     await mongoDisconnect();
   });
-  describe("Test GET /launches", () => {
+  describe("Test GET /v1/launches", () => {
     it("Should respond with 200 success", async () => {
       const response = await request(app)
-        .get("/launches")
+        .get("/v1/launches")
         .expect("Content-Type", /json/)
         .expect(200);
     });
   });
 
-  describe("Test POST /launches", () => {
+  describe("Test POST /v1/launches", () => {
     const mockLaunch = {
       mission: "ZTMLeaderA1",
       rocket: "Space Alpha 01",
@@ -37,7 +37,7 @@ describe("Launches tests", () => {
 
     it("Should respond with 201 created", async () => {
       const response = await request(app)
-        .post("/launches")
+        .post("/v1/launches")
         .send(mockLaunch)
         .expect("Content-Type", /json/)
         .expect(201);
@@ -55,7 +55,7 @@ describe("Launches tests", () => {
 
     it("Should respond with 400 catching missing properties", async () => {
       const response = await request(app)
-        .post("/launches")
+        .post("/v1/launches")
         .send(mockLaunchWithOutAProperty)
         .expect("Content-Type", /json/)
         .expect(400);
@@ -69,7 +69,7 @@ describe("Launches tests", () => {
 
     it("Should respond with 400 catching invalid launch date", async () => {
       const response = await request(app)
-        .post("/launches")
+        .post("/v1/launches")
         .send({ ...mockLaunch, launchDate: "time" })
         .expect("Content-Type", /json/)
         .expect(400);
