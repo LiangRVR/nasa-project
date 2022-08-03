@@ -25,6 +25,49 @@ const getLatestFlightNumber = async () => {
   return latestLaunch.flightNumber;
 };
 
+const fetchLaunchesFromSpaceXApi = async (queryOptionsToAdd) => {
+  return await axios.post(SPACEX_API_URL, {
+    query: {},
+    options: {
+      ...queryOptionsToAdd,
+      populate: [
+        {
+          path: "rocket",
+          select: ["name"],
+        },
+        {
+          path: "payloads",
+          select: ["customers"],
+        },
+      ],
+    },
+  });
+};
+
+const getLaunches = async () => {
+  console.log("Downloading Launches Data");
+  const response = await fetchLaunchesFromSpaceXApi({ pagination: false });
+
+  const launchDocs = response.data.docs;
+  launchDocs.map((launchDoc) => {
+    const customers = launchDoc.payloads.flatMap(
+      (payload) => payload.customers
+    );
+
+    const launch = {
+      flightNumber: launchDoc.flight_number,
+      mission: launchDoc.name,
+      rocket: launchDoc.rocket.name,
+      launchDate: launchDoc.date_local,
+      customers,
+      upcoming: launchDoc.upcoming,
+      success: launchDoc.success,
+    };
+
+    console.log(launch.flightNumber, launch.mission);
+  });
+};
+
 launchesModel.getAllLaunches = async () => {
   return await launches.find({}, { _id: 0, __v: 0 });
 };
@@ -66,8 +109,12 @@ launchesModel.scheduleNewLaunch = async (launch) => {
   await launchesModel.saveLaunch(newLaunch);
 };
 
+launchesModel.findLaunch = async (launch) => {
+  return await launches.find(launch);
+};
+
 launchesModel.existLaunchWithId = async (id) => {
-  return await launches.find({ flightNumber: id });
+  return await launchesModel.findLaunch({ flightNumber: id });
 };
 
 launchesModel.abortLaunchById = async (id) => {
@@ -82,42 +129,7 @@ launchesModel.abortLaunchById = async (id) => {
 };
 
 launchesModel.loadLaunchesData = async () => {
-  console.log("Downloading Launches Data");
-  const response = await axios.post(SPACEX_API_URL, {
-    query: {},
-    options: {
-      pagination: false,
-      populate: [
-        {
-          path: "rocket",
-          select: ["name"],
-        },
-        {
-          path: "payloads",
-          select: ["customers"],
-        },
-      ],
-    },
-  });
-
-  const launchDocs = response.data.docs;
-  launchDocs.map((launchDoc) => {
-    const customers = launchDoc.payloads.flatMap(
-      (payload) => payload.customers
-    );
-
-    const launch = {
-      flightNumber: launchDoc.flight_number,
-      mission: launchDoc.name,
-      rocket: launchDoc.rocket.name,
-      launchDate: launchDoc.date_local,
-      customers,
-      upcoming: launchDoc.upcoming,
-      success: launchDoc.success,
-    };
-
-    console.log(launch.flightNumber, launch.mission);
-  });
+  await getLaunches()
 };
 
 module.exports = launchesModel;
