@@ -11,7 +11,7 @@ const launch = {
   rocket: "Explorer IS1",
   launchDate: new Date("December 27, 2030"),
   target: "Kepler-442 b",
-  customer: ["ZTM", "NASA"],
+  customers: ["ZTM", "NASA"],
   upcoming: true,
   success: true,
 };
@@ -60,7 +60,7 @@ launchesModel.scheduleNewLaunch = async (launch) => {
   const newLaunch = Object.assign(launch, {
     upcoming: true,
     success: true,
-    customer: ["ZTM", "NASA"],
+    customers: ["ZTM", "NASA"],
     flightNumber: newFlightNumber,
   });
   await launchesModel.saveLaunch(newLaunch);
@@ -89,18 +89,32 @@ launchesModel.loadLaunchesData = async () => {
       populate: [
         {
           path: "rocket",
-          select: {
-            name: 1,
-          },
+          select: ["name"],
         },
         {
-          path: "payload",
-          select: {
-            customers: 1,
-          },
+          path: "payloads",
+          select: ["customers"],
         },
       ],
     },
+  });
+
+  const launchDocs = response.data.docs;
+  launchDocs.map((launchDoc) => {
+    const customers = launchDoc.payloads.flatMap(
+      (payload) => payload.customers
+    );
+    const launch = {
+      flightNumber: launchDoc.flight_number,
+      mission: launchDoc.name,
+      rocket: launchDoc.rocket.name,
+      launchDate: launchDoc.date_local,
+      customers,
+      upcoming: launchDoc.upcoming,
+      success: launchDoc.success,
+    };
+
+    console.log(launch);
   });
 };
 
