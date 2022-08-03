@@ -44,7 +44,7 @@ const fetchLaunchesFromSpaceXApi = async (queryOptionsToAdd) => {
   });
 };
 
-const getLaunches = async () => {
+const getLaunchesFromResponse = async () => {
   console.log("Downloading Launches Data");
   const response = await fetchLaunchesFromSpaceXApi({ pagination: false });
 
@@ -129,7 +129,25 @@ launchesModel.abortLaunchById = async (id) => {
 };
 
 launchesModel.loadLaunchesData = async () => {
-  await getLaunches()
+  const latestLaunchInSpaceXApi = await fetchLaunchesFromSpaceXApi({
+    limit: 1,
+    sort: {
+      flight_number: "desc",
+    },
+  });
+  const launchDoc = latestLaunchInSpaceXApi.data.docs[0];
+
+  const latestLaunch = await launchesModel.findLaunch({
+    flightNumber: launchDoc.flight_number,
+    mission: launchDoc.name,
+    rocket: launchDoc.rocket.name,
+  });
+  
+  if (latestLaunch.length) {
+    console.log("Launches Data already loaded");
+  } else {
+    await getLaunchesFromResponse();
+  }
 };
 
 module.exports = launchesModel;
