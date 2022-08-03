@@ -6,8 +6,13 @@ const {
 } = require("../../models/launches.model");
 const launchesController = {};
 
+const { getPagination } = require("../../services/query");
+
 launchesController.httpGetAllLaunches = async (req, res) => {
-  res.status(200).json(await getAllLaunches());
+  const { skip, limit } = getPagination(req.query);
+  const launches = await getAllLaunches(skip, limit);
+
+  res.status(200).json(launches);
 };
 
 launchesController.httpAddNewLaunch = async (req, res) => {
