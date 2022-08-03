@@ -48,6 +48,10 @@ const getLaunchesFromResponse = async () => {
   console.log("Downloading Launches Data");
   const response = await fetchLaunchesFromSpaceXApi({ pagination: false });
 
+  if(response.status !== 200){
+    throw new Error("There was a problem getting launches from SpaceX API")
+  }
+
   const launchDocs = response.data.docs;
 
   launchDocs.map((launchDoc) => {
@@ -99,7 +103,7 @@ launchesModel.scheduleNewLaunch = async (launch) => {
   if (!planet) {
     throw new Error("No matching planet found");
   }
-  
+
   const newFlightNumber = (await getLatestFlightNumber()) + 1;
   const newLaunch = Object.assign(launch, {
     upcoming: true,
@@ -130,13 +134,18 @@ launchesModel.abortLaunchById = async (id) => {
 };
 
 launchesModel.loadLaunchesData = async () => {
-  const latestLaunchInSpaceXApi = await fetchLaunchesFromSpaceXApi({
+  const latestLaunchInSpaceXApiResponse = await fetchLaunchesFromSpaceXApi({
     limit: 1,
     sort: {
       flight_number: "desc",
     },
   });
-  const launchDoc = latestLaunchInSpaceXApi.data.docs[0];
+
+  if(latestLaunchInSpaceXApiResponse.status !== 200){
+    throw new Error("There was a problem getting the latest launch from SpaceX API")
+  }
+
+  const launchDoc = latestLaunchInSpaceXApiResponse.data.docs[0];
 
   const latestLaunch = await launchesModel.findLaunch({
     flightNumber: launchDoc.flight_number,
