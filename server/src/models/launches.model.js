@@ -48,8 +48,8 @@ const getLaunchesFromResponse = async () => {
   console.log("Downloading Launches Data");
   const response = await fetchLaunchesFromSpaceXApi({ pagination: false });
 
-  if(response.status !== 200){
-    throw new Error("There was a problem getting launches from SpaceX API")
+  if (response.status !== 200) {
+    throw new Error("There was a problem getting launches from SpaceX API");
   }
 
   const launchDocs = response.data.docs;
@@ -73,8 +73,8 @@ const getLaunchesFromResponse = async () => {
   });
 };
 
-launchesModel.getAllLaunches = async () => {
-  return await launches.find({}, { _id: 0, __v: 0 });
+launchesModel.getAllLaunches = async (skip, limit) => {
+  return await launches.find({}, { _id: 0, __v: 0 }).skip(skip).limit(limit);
 };
 
 launchesModel.saveLaunch = async (launch) => {
@@ -141,8 +141,10 @@ launchesModel.loadLaunchesData = async () => {
     },
   });
 
-  if(latestLaunchInSpaceXApiResponse.status !== 200){
-    throw new Error("There was a problem getting the latest launch from SpaceX API")
+  if (latestLaunchInSpaceXApiResponse.status !== 200) {
+    throw new Error(
+      "There was a problem getting the latest launch from SpaceX API"
+    );
   }
 
   const launchDoc = latestLaunchInSpaceXApiResponse.data.docs[0];
