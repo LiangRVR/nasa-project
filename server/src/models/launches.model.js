@@ -49,6 +49,7 @@ const getLaunchesFromResponse = async () => {
   const response = await fetchLaunchesFromSpaceXApi({ pagination: false });
 
   const launchDocs = response.data.docs;
+
   launchDocs.map((launchDoc) => {
     const customers = launchDoc.payloads.flatMap(
       (payload) => payload.customers
@@ -64,7 +65,7 @@ const getLaunchesFromResponse = async () => {
       success: launchDoc.success,
     };
 
-    console.log(launch.flightNumber, launch.mission);
+    launchesModel.saveLaunch(launch);
   });
 };
 
@@ -73,14 +74,6 @@ launchesModel.getAllLaunches = async () => {
 };
 
 launchesModel.saveLaunch = async (launch) => {
-  const planet = await planets.findOne({
-    keplerName: launch.target,
-  });
-
-  if (!planet) {
-    throw new Error("No matching planet found");
-  }
-
   try {
     await launches.findOneAndUpdate(
       {
@@ -99,6 +92,14 @@ launchesModel.saveLaunch = async (launch) => {
 launchesModel.saveLaunch(launch);
 
 launchesModel.scheduleNewLaunch = async (launch) => {
+  const planet = await planets.findOne({
+    keplerName: launch.target,
+  });
+
+  if (!planet) {
+    throw new Error("No matching planet found");
+  }
+  
   const newFlightNumber = (await getLatestFlightNumber()) + 1;
   const newLaunch = Object.assign(launch, {
     upcoming: true,
@@ -142,7 +143,7 @@ launchesModel.loadLaunchesData = async () => {
     mission: launchDoc.name,
     rocket: launchDoc.rocket.name,
   });
-  
+
   if (latestLaunch.length) {
     console.log("Launches Data already loaded");
   } else {
