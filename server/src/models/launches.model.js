@@ -86,6 +86,7 @@ launchesModel.loadLaunchesData = async () => {
   const response = await axios.post(SPACEX_API_URL, {
     query: {},
     options: {
+      pagination: false,
       populate: [
         {
           path: "rocket",
@@ -104,6 +105,7 @@ launchesModel.loadLaunchesData = async () => {
     const customers = launchDoc.payloads.flatMap(
       (payload) => payload.customers
     );
+
     const launch = {
       flightNumber: launchDoc.flight_number,
       mission: launchDoc.name,
@@ -114,7 +116,7 @@ launchesModel.loadLaunchesData = async () => {
       success: launchDoc.success,
     };
 
-    console.log(launch);
+    console.log(launch.flightNumber, launch.mission);
   });
 };
 
