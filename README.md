@@ -4,7 +4,7 @@ The completed version of our NASA project using node, express, mongodb and react
 
 ## Project Diagram
 
-<img style='width: 80%' src='Model_databases.svg' alt="Project Diagram"/>
+<img style='display: block; width: 80%; margin: 0 auto;' src='Model_databases.svg' alt="Project Diagram"/>
 
 ## Getting Started
 
